@@ -1,6 +1,6 @@
 # flutter_bloc_e03_todoapp
 
-A new Flutter application.
+![](https://j.gifs.com/6X1v1n.gif)
 
 ## Getting Started
 
