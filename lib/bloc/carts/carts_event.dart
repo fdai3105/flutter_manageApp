@@ -10,21 +10,21 @@ class CartLoader extends CartEvent {
 }
 
 class CartAdd extends CartEvent {
-  final Product todo;
+  final Product product;
 
-  const CartAdd(this.todo);
+  const CartAdd(this.product);
 
   @override
-  List<Object> get props => [todo];
+  List<Object> get props => [product];
 }
 
 class CartDelete extends CartEvent {
-  final Product todo;
+  final Product product;
 
-  const CartDelete(this.todo);
+  const CartDelete(this.product);
 
   @override
-  List<Object> get props => [todo];
+  List<Object> get props => [product];
 }
 
 class CartIncrement extends CartEvent {

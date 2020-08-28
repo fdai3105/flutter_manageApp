@@ -41,72 +41,83 @@ class DialogEditProduct extends StatelessWidget {
         elevation: 8,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(kRadius)),
-        content: Wrap(
-          children: <Widget>[
-            Column(
-              children: <Widget>[
-                Container(
-                  width: kContentW,
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Form(
-                      key: _kForm,
-                      child: Column(
-                        children: <Widget>[
-                          TextFieldDialog(
-                            label: "Name product",
-                            defaultValue: product.name.toString(),
-                            onSave: (value) => name = value,
-                          ),
-                          const SizedBox(
-                            height: kSizedBoxH,
-                          ),
-                          TextFieldDialog(
-                            label: "Desc product",
-                            defaultValue: product.desc,
-                            onSave: (value) => desc = value,
-                          )
-                        ],
-                      )),
-                ),
-                const SizedBox(
-                  height: kSizedBoxH,
-                ),
-                DropDownDialog(
-                  items: Repositories.categories,
-                  category: product.category,
-                  onChange: (value) => category = value,
-                ),
-                const SizedBox(
-                  height: kSizedBoxH,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    ButtonDefault(
-                      onTap: () {
-                        _kForm.currentState.save();
-                        onTap(name, category, price, desc);
-                        Navigator.popUntil(context, ModalRoute.withName("/"));
-                      },
-                      text: Text(
-                        "OK",
-                        style: theme.textTheme.button,
-                      ),
-                    ),
-                    ButtonDefault(
-                        onTap: () => Navigator.pop(context),
+        content: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Wrap(
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Container(
+                    width: kContentW,
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Form(
+                        key: _kForm,
+                        child: Column(
+                          children: <Widget>[
+                            TextFieldDialog(
+                              label: "Name product",
+                              defaultValue: product.name.toString(),
+                              onSave: (value) => name = value,
+                            ),
+                            const SizedBox(
+                              height: kSizedBoxH,
+                            ),
+                            DropDownDialog(
+                              items: Repositories.categories,
+                              category: product.category,
+                              onChange: (value) => category = value,
+                            ),
+                            const SizedBox(
+                              height: kSizedBoxH,
+                            ),
+                            TextFieldDialog(
+                              label: "Desc product",
+                              defaultValue: product.desc,
+                              onSave: (value) => desc = value,
+                            ),
+                            const SizedBox(
+                              height: kSizedBoxH,
+                            ),
+                            TextFieldDialog(
+                                label: "Price",
+                                defaultValue: product.price.toString(),
+                                isPrice: true,
+                                onSave: (value) => price = value),
+                          ],
+                        )),
+                  ),
+                  const SizedBox(
+                    height: kSizedBoxH,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      ButtonDefault(
+                        onTap: () {
+                          _kForm.currentState.save();
+                          onTap(name, category, price, desc);
+                          Navigator.popUntil(context, ModalRoute.withName("/"));
+                        },
                         text: Text(
-                          "Cancel",
+                          "OK",
                           style: theme.textTheme.button,
                         ),
-                        decoration: BoxDecoration(
-                            color: Colors.black26,
-                            borderRadius: BorderRadius.circular(10))),
-                  ],
-                )
-              ],
-            ),
-          ],
+                      ),
+                      ButtonDefault(
+                          onTap: () => Navigator.pop(context),
+                          text: Text(
+                            "Cancel",
+                            style: theme.textTheme.button,
+                          ),
+                          decoration: BoxDecoration(
+                              color: Colors.black26,
+                              borderRadius: BorderRadius.circular(10))),
+                    ],
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

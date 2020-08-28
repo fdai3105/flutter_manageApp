@@ -3,9 +3,14 @@
 // @link ff3105.github.io
 // @created  $
 // @Usage
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../app_keys.dart';
+import '../widgets/button_default.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../utils/utils.dart';
 import '../bloc/carts/carts_bloc.dart';
 import '../model/cart.dart';
@@ -39,19 +44,87 @@ class CartListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return BlocBuilder<CartsBloc, CartsState>(
       builder: (context, state) {
         if (state is CartsLoadSuccess) {
           if (state.carts.isNotEmpty) {
             final _carts = state.carts;
-            return ListView.builder(
-              physics: const BouncingScrollPhysics(),
-              itemCount: _carts.length,
-              itemBuilder: (context, index) {
-                return CartItemList(
-                  cart: _carts[index],
-                );
-              },
+            var total = 0;
+            _carts.forEach((element) {
+              final totalItem = element.product.price * element.quality;
+              total += totalItem;
+            });
+            return SlidingUpPanel(
+//              margin: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+              backdropEnabled: true,
+              backdropOpacity: 0,
+              backdropTapClosesPanel: true,
+              minHeight: 80,
+              color: Colors.brown,
+              body: ListView.builder(
+                padding: const EdgeInsets.only(bottom: 180),
+                physics: const BouncingScrollPhysics(),
+                itemCount: _carts.length,
+                itemBuilder: (context, index) {
+                  return CartItemList(
+                    cart: _carts[index],
+                  );
+                },
+              ),
+              panel: Container(
+                padding: const EdgeInsets.only(top: 10, left: 20, right: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          width: 30,
+                          height: 5,
+                          decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(12))),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      "Total: ${formatMoney(total)}",
+                      style: theme.textTheme.bodyText2.copyWith(fontSize: 22),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      "Total item: ${_carts.length}",
+                      style: theme.textTheme.bodyText2.copyWith(fontSize: 22),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Center(
+                      child: ButtonDefault(
+                          onTap: () {},
+                          height: 50,
+                          width: MediaQuery.of(context).size.width / 1.5,
+                          decoration: BoxDecoration(
+                              color: AppKeys.kRedButton,
+                              borderRadius: BorderRadius.circular(10)),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          text: Text(
+                            "Check out!",
+                            style: theme.textTheme.bodyText2.copyWith(
+                                fontSize: 22, fontWeight: FontWeight.w700),
+                          )),
+                    )
+                  ],
+                ),
+              ),
             );
           } else {
             return const Center(
@@ -98,7 +171,7 @@ class CartItemList extends StatelessWidget {
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             title: Text(
-              "Product : ${_carts.todo.name}",
+              "Product : ${_carts.product.name}",
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,29 +180,31 @@ class CartItemList extends StatelessWidget {
                   height: 5,
                 ),
                 Text(
-                  "Price : ${formatMoney(_carts.todo.price)}, Qty: ${_carts.quality}",
+                  "Price : ${formatMoney(_carts.product.price)}, Qty: ${_carts.quality}",
                   style: Theme.of(context).textTheme.bodyText2,
                 ),
                 const SizedBox(
                   height: 5,
                 ),
                 Text(
-                  "Total : ${formatMoney(_carts.todo.price * _carts.quality)}",
+                  "Total : ${formatMoney(_carts.product.price * _carts.quality)}",
                   style: Theme.of(context).textTheme.bodyText2,
                 ),
               ],
             ),
             trailing: ButtonTheme(
-              minWidth: 16,
+              minWidth: 60,
+              height: 50,
               child: FlatButton(
-                color: Colors.blueGrey,
                 onPressed: () {
-                  context.bloc<CartsBloc>().add(CartDelete(_carts.todo));
+                  context.bloc<CartsBloc>().add(CartDelete(_carts.product));
                 },
-                child: Icon(
-                  Icons.close,
+                color: AppKeys.kRedButton,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                child: ImageIcon(
+                  const AssetImage("assets/images/icons/ic_delete.png"),
                   color: Colors.white,
-                  size: 20,
                 ),
               ),
             ),

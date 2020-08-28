@@ -10,9 +10,14 @@ class TextFieldDialog extends StatefulWidget {
   final String label;
   final String defaultValue;
   final onTextFieldSave onSave;
+  final bool isPrice;
 
   const TextFieldDialog(
-      {Key key, @required this.label, this.defaultValue, @required this.onSave})
+      {Key key,
+      @required this.label,
+      this.defaultValue,
+      @required this.onSave,
+      this.isPrice = false})
       : super(key: key);
 
   @override
@@ -26,6 +31,13 @@ class _TextFieldDialogState extends State<TextFieldDialog> {
   void initState() {
     if (widget.defaultValue != null) {
       _editingController = TextEditingController(text: widget.defaultValue);
+    }
+    if (widget.isPrice) {
+      _editingController = MoneyMaskedTextController(
+          decimalSeparator: "",
+          thousandSeparator: ",",
+          rightSymbol: " ₫",
+          precision: 0);
     }
     super.initState();
   }
@@ -41,7 +53,9 @@ class _TextFieldDialogState extends State<TextFieldDialog> {
         border: theme.inputDecorationTheme.border,
         focusedBorder: theme.inputDecorationTheme.focusedBorder,
       ),
-      onSaved: widget.onSave,
+      onSaved: (value) {
+        widget.onSave(widget.isPrice ? replaceMoney(value) : value);
+      },
     );
   }
 }

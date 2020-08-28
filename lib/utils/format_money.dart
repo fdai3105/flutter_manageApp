@@ -9,8 +9,13 @@ part of 'utils.dart';
 String formatMoney(int value) {
   if (value != null) {
     final money = NumberFormat().format(value);
-    return "$money₫";
+    return "$money ₫";
   } else {
     return "";
   }
+}
+
+int replaceMoney(String value) {
+  final newValue = int.parse(value.replaceAll(RegExp(r'[^\d]'), ""));
+  return newValue;
 }

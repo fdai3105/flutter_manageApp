@@ -18,60 +18,63 @@ class ProductsBloc extends Bloc<ProductEvent, ProductsState> {
   @override
   Stream<ProductsState> mapEventToState(ProductEvent event) async* {
     if (event is ProductLoader) {
-      yield* _mapTodosLoadedToState();
+      yield* _mapProductsLoadedToState();
     } else if (event is ProductAdded) {
-      yield* _mapTodoAddedToState(event);
+      yield* _mapProductAddedToState(event);
     } else if (event is ProductUpdated) {
-      yield* _mapTodoUpdateToState(event);
+      yield* _mapProductUpdateToState(event);
     } else if (event is ProductDeleted) {
-      yield* _mapTodoDeleteToState(event);
+      yield* _mapProductDeleteToState(event);
     } else if (event is ProductFiltered) {
       _productFiltered = event;
-      yield* _mapTodoFilteredToState(
+      yield* _mapProductFilteredToState(
         filtered: event,
         searched: null,
       );
     } else if (event is ProductSearched) {
       _productSearched = event;
-      yield* _mapTodoSearchedToState(event);
+      yield* _mapProductSearchedToState(event);
     }
   }
 
-  Stream<ProductsState> _mapTodosLoadedToState() async* {
-    yield ProductsLoadSuccess(todos: _repositories.products);
+  Stream<ProductsState> _mapProductsLoadedToState() async* {
+    yield ProductsLoadSuccess(products: _repositories.products);
   }
 
-  Stream<ProductsState> _mapTodoAddedToState(ProductAdded event) async* {
-    _repositories.products.add(event.product);
-    yield* _mapTodoSearchedToState(_productSearched);
+  Stream<ProductsState> _mapProductAddedToState(ProductAdded event) async* {
+    _repositories.products.add(event.product
+        .copyWith(id: event.product.id ?? _repositories.products.length));
+    yield* _mapProductSearchedToState(_productSearched);
   }
 
-  Stream<ProductsState> _mapTodoUpdateToState(ProductUpdated event) async* {
+  Stream<ProductsState> _mapProductUpdateToState(ProductUpdated event) async* {
     final products = _repositories.products;
     for (var i = 0; i < products.length; i++) {
       if (products[i].id == event.product.id) {
         products[i] = event.product;
       }
     }
-    yield* _mapTodoSearchedToState(_productSearched);
+    yield* _mapProductSearchedToState(_productSearched);
   }
 
-  Stream<ProductsState> _mapTodoDeleteToState(ProductDeleted event) async* {
+  Stream<ProductsState> _mapProductDeleteToState(ProductDeleted event) async* {
     _repositories.products
         .removeWhere((element) => element.id == event.product.id);
-    yield* _mapTodoSearchedToState(_productSearched);
+    yield* _mapProductSearchedToState(_productSearched);
   }
 
-  Stream<ProductsState> _mapTodoSearchedToState(ProductSearched event) async* {
-    yield* _mapTodoFilteredToState(
+  Stream<ProductsState> _mapProductSearchedToState(
+      ProductSearched event) async* {
+    yield ProductsLoadProgress();
+    yield* _mapProductFilteredToState(
         filtered: _productFiltered, searched: _productSearched);
   }
 
-  Stream<ProductsState> _mapTodoFilteredToState(
+  Stream<ProductsState> _mapProductFilteredToState(
       {ProductFiltered filtered, ProductSearched searched}) async* {
     filtered ??= _productFiltered;
     searched ??= _productSearched;
-    final _filterTodo = _repositories.products.where((element) {
+    final _filterProducts = _repositories.products.where((element) {
       if (filtered == null || filtered.category == null) {
         if (searched == null) {
           return true;
@@ -87,6 +90,6 @@ class ProductsBloc extends Bloc<ProductEvent, ProductsState> {
         }
       }
     }).toList();
-    yield ProductsLoadSuccess(todos: _filterTodo);
+    yield ProductsLoadSuccess(products: _filterProducts);
   }
 }

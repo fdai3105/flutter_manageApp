@@ -1,10 +1,11 @@
 import 'dart:ui';
 
 import 'package:badges/badges.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc_e03_todoapp/app_keys.dart';
 import '../bloc/products/products_bloc.dart';
 import '../utils/utils.dart';
 import '../widgets/widgets.dart';
@@ -101,21 +102,24 @@ class HomePage extends StatelessWidget {
         backgroundColor: Theme.of(context).backgroundColor,
         elevation: 0,
       ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        color: Theme.of(context).backgroundColor,
-        child: Column(
-          children: const <Widget>[
-            ListCategory(),
-            SizedBox(
-              height: 20,
-            ),
-            Search(),
-            SizedBox(
-              height: 20,
-            ),
-            ProductList(),
-          ],
+      body: GestureDetector(
+        onTap: () => unFocusTextField(context),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          color: Theme.of(context).backgroundColor,
+          child: Column(
+            children: const <Widget>[
+              ListCategory(),
+              SizedBox(
+                height: 20,
+              ),
+              Search(),
+              SizedBox(
+                height: 20,
+              ),
+              ProductList(),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -138,7 +142,11 @@ class HomePage extends StatelessWidget {
         },
         backgroundColor: Theme.of(context).primaryColor,
         child: IconTheme(
-            data: Theme.of(context).iconTheme, child: Icon(Icons.add)),
+            data: Theme.of(context).iconTheme,
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
+            )),
       ),
     );
   }
@@ -156,10 +164,10 @@ class Search extends StatelessWidget {
     final _controller = TextEditingController();
     return TextFormField(
       controller: _controller,
+      autofocus: false,
       onChanged: (value) {
         context.bloc<ProductsBloc>().add(ProductSearched(keyWord: value));
       },
-      autofocus: false,
       decoration: InputDecoration(
           hintText: "Search: ",
           suffixIcon: IconButton(
@@ -221,6 +229,7 @@ class _CategoryButton extends StatelessWidget {
     final textTheme = theme.textTheme;
     return GestureDetector(
       onTap: () {
+        unFocusTextField(context);
         context.bloc<CategoriesBloc>().add(CategorySelect(
               category: isSelect ? null : category,
               selectID: isSelect ? null : category.id,
@@ -230,10 +239,13 @@ class _CategoryButton extends StatelessWidget {
             .add(ProductFiltered(category: isSelect ? null : category));
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
+            border:
+                isSelect ? Border.all(color: const Color(0xFF11cbd7)) : null,
             borderRadius: BorderRadius.circular(10),
-            color: isSelect ? theme.cardColor : Colors.transparent),
+            color: Colors.transparent),
         child: Row(
           children: <Widget>[
             Text(
@@ -241,15 +253,15 @@ class _CategoryButton extends StatelessWidget {
               style: textTheme.bodyText1,
             ),
             const SizedBox(
-              width: 10,
+              width: 5,
             ),
-            if (isSelect)
-              Align(
-                  alignment: Alignment.center,
-                  child: Icon(
-                    Icons.close,
-                    size: 20,
-                  )),
+            Align(
+                alignment: Alignment.center,
+                child: Icon(
+                  Icons.close,
+                  color: isSelect ? theme.iconTheme.color : Colors.transparent,
+                  size: 20,
+                )),
           ],
         ),
       ),
@@ -265,14 +277,13 @@ class ProductList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Expanded(
       child: BlocBuilder<ProductsBloc, ProductsState>(
         builder: (context, state) {
           if (state is ProductsLoadSuccess) {
-            if (state.todos.isNotEmpty) {
-              final _todos = state.todos;
-              return ProductItem(todos: _todos, theme: theme);
+            if (state.products.isNotEmpty) {
+              final _products = state.products;
+              return ProductItem(products: _products);
             } else {
               return const Center(
                 child: Text("Nothing to show"),
@@ -290,47 +301,40 @@ class ProductList extends StatelessWidget {
 }
 
 class ProductItem extends StatelessWidget {
-  const ProductItem({
-    Key key,
-    @required List<Product> todos,
-    @required this.theme,
-  })  : _todos = todos,
-        super(key: key);
+  final List<Product> products;
 
-  final List<Product> _todos;
-  final ThemeData theme;
+  const ProductItem({Key key, this.products}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final _theme = Theme.of(context);
     return ListView.builder(
         physics: const BouncingScrollPhysics(),
-        itemCount: _todos.length,
+        itemCount: products.length,
         itemBuilder: (builder, index) {
           return Container(
-            margin: EdgeInsets.symmetric(vertical: (index == 0) ? 0 : 20),
+            margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(10),
             ),
             child: ListTile(
               onTap: () {
+                unFocusTextField(context);
                 showModalBottomSheet(
                     context: context,
                     elevation: 18,
-                    builder: (context) => BottomSheetTodo(
-                          product: _todos[index],
+                    builder: (context) => BottomSheetProduct(
+                          product: products[index],
                         ));
               },
               contentPadding:
                   const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              leading: CachedNetworkImage(
-                placeholder: (context, value) {
-                  return const CircularProgressIndicator();
-                },
-                imageUrl: "https://via.placeholder.com/220x220?text=fdai",
+              leading: Image.network(
+                "https://via.placeholder.com/220x220?text=fdai",
               ),
               title: Text(
-                "${_todos[index].name}",
+                "${products[index].name}",
                 style: Theme.of(context)
                     .textTheme
                     .bodyText1
@@ -343,19 +347,19 @@ class ProductItem extends StatelessWidget {
                     height: 5,
                   ),
                   Text(
-                    "Cate: ${_todos[index].category.name}",
-                    style: theme.textTheme.bodyText2,
+                    "Cate: ${products[index].category.name}",
+                    style: _theme.textTheme.bodyText2,
                   ),
                   const SizedBox(
                     height: 5,
                   ),
                   Text(
-                    "Price: ${formatMoney(_todos[index].price)}",
-                    style: theme.textTheme.bodyText2,
+                    "Price: ${formatMoney(products[index].price)}",
+                    style: _theme.textTheme.bodyText2,
                   ),
                 ],
               ),
-              trailing: _AddToCartButton(todo: _todos[index]),
+              trailing: _AddToCartButton(product: products[index]),
             ),
           );
         });
@@ -363,11 +367,11 @@ class ProductItem extends StatelessWidget {
 }
 
 class _AddToCartButton extends StatelessWidget {
-  final Product todo;
+  final Product product;
 
   const _AddToCartButton({
     Key key,
-    this.todo,
+    this.product,
   }) : super(key: key);
 
   @override
@@ -375,31 +379,29 @@ class _AddToCartButton extends StatelessWidget {
     return BlocBuilder<CartsBloc, CartsState>(
       builder: (context, state) {
         if (state is CartsLoadSuccess) {
-          final todos = state.carts.map((e) => e.todo).toList();
+          final _products = state.carts.map((e) => e.product).toList();
+          final _isInCart = _products.contains(product);
           return FlatButton(
+            padding: const EdgeInsets.symmetric(vertical: 13),
             onPressed: () {
+              unFocusTextField(context);
               Vibration.vibrate(duration: 100);
-              todos.contains(todo)
-                  ? context.bloc<CartsBloc>().add(CartDelete(todo))
-                  : context.bloc<CartsBloc>().add(CartAdd(todo));
+              _isInCart
+                  ? context.bloc<CartsBloc>().add(CartDelete(product))
+                  : context.bloc<CartsBloc>().add(CartAdd(product));
             },
-            color: Theme.of(context).buttonColor,
-            splashColor: Colors.white24,
-            child: todos.contains(todo)
-                ? Text(
-                    "Remove",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1
-                        .copyWith(color: Colors.greenAccent),
-                  )
-                : Text(
-                    "Add",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1
-                        .copyWith(color: Colors.white),
-                  ),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            color:
+                _isInCart ? AppKeys.kRedButton : Theme.of(context).buttonColor,
+            splashColor: AppKeys.kLightColorButton,
+            child: Text(
+              _isInCart ? "Remove" : "Add",
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText1
+                  .copyWith(color: Colors.white),
+            ),
           );
         } else if (state is CartsLoadProgress) {
           return const CircularProgressIndicator();
@@ -411,4 +413,9 @@ class _AddToCartButton extends StatelessWidget {
       },
     );
   }
+}
+
+/// Use to unfocus all textfield
+void unFocusTextField(BuildContext context) {
+  FocusScope.of(context).unfocus();
 }

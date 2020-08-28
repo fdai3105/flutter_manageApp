@@ -36,13 +36,13 @@ class CartsBloc extends Bloc<CartEvent, CartsState> {
 
   Stream<CartsState> _mapCartAdderToState(CartAdd event) async* {
     final carts = List<Cart>.from((state as CartsLoadSuccess).carts);
-    carts.add(Cart(id: carts.length, todo: event.todo, quality: 1));
+    carts.add(Cart(id: carts.length, product: event.product, quality: 1));
     yield CartsLoadSuccess(carts: carts);
   }
 
   Stream<CartsState> _mapCartDeletedToState(CartDelete event) async* {
     final _delCart = List<Cart>.from((state as CartsLoadSuccess).carts)
-      ..removeWhere((element) => element.todo.id == event.todo.id);
+      ..removeWhere((element) => element.product.id == event.product.id);
     yield CartsLoadSuccess(carts: _delCart);
   }
 

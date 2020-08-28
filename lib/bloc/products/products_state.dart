@@ -10,12 +10,12 @@ class ProductsLoadProgress extends ProductsState {
 }
 
 class ProductsLoadSuccess extends ProductsState {
-  final List<Product> todos;
+  final List<Product> products;
 
-  const ProductsLoadSuccess({this.todos = const []});
+  const ProductsLoadSuccess({this.products});
 
   @override
-  List<Object> get props => [todos];
+  List<Object> get props => [products];
 }
 
 class ProductsLoadFailure extends ProductsState {

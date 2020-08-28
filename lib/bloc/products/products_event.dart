@@ -16,11 +16,6 @@ class ProductAdded extends ProductEvent {
 
   @override
   List<Object> get props => [product];
-
-  @override
-  String toString() {
-    return 'TodoAdder{todo: $product}';
-  }
 }
 
 class ProductAddToCart extends ProductEvent {
@@ -30,11 +25,6 @@ class ProductAddToCart extends ProductEvent {
 
   @override
   List<Object> get props => [product];
-
-  @override
-  String toString() {
-    return 'TodoAddToCart{todo: $product}';
-  }
 }
 
 class ProductUpdated extends ProductEvent {

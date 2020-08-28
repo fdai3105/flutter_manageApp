@@ -44,6 +44,9 @@ class _DropDownDialogState extends State<DropDownDialog> {
             borderRadius: BorderRadius.circular(5)),
         child: DropdownButtonHideUnderline(
           child: DropdownButton(
+              onTap: () {
+                unFocusTextField(context);
+              },
               style: Theme.of(context)
                   .textTheme
                   .bodyText1

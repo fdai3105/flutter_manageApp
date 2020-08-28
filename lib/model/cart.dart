@@ -10,22 +10,17 @@ import 'product.dart';
 
 class Cart extends Equatable {
   final int id;
-  final Product todo;
+  final Product product;
   final int quality;
 
-  const Cart({this.id, this.todo, this.quality});
+  const Cart({this.id, this.product, this.quality});
 
-  @override
-  String toString() {
-    return 'Cart{id: $id, todo: $todo, quality: $quality} \n';
-  }
-
-  Cart copyWith({int id, Product todo, int quality}) {
+  Cart copyWith({int id, Product product, int quality}) {
     return Cart(id: id ?? this.id,
-        todo: todo ?? this.todo,
+        product: product ?? this.product,
         quality: quality ?? this.quality);
   }
 
   @override
-  List<Object> get props => [id,todo,quality];
+  List<Object> get props => [id,product,quality];
 }

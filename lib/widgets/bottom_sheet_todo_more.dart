@@ -6,17 +6,17 @@
 
 part of 'widgets.dart';
 
-class BottomSheetTodo extends StatelessWidget {
+class BottomSheetProduct extends StatelessWidget {
   final Product product;
 
-  const BottomSheetTodo({Key key, this.product}) : super(key: key);
+  const BottomSheetProduct({Key key, this.product}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        // edit todos
+        // edit product
         InkWell(
           onTap: () {
             showDialog(
@@ -42,13 +42,13 @@ class BottomSheetTodo extends StatelessWidget {
           },
           child: ListTile(
             title: Text(
-              "Edit todo",
+              "Edit product",
               style: Theme.of(context).textTheme.bodyText1,
             ),
             trailing: Icon(Icons.edit),
           ),
         ),
-        // delete todos
+        // delete product
         InkWell(
           onTap: () {
             context.bloc<ProductsBloc>().add(ProductDeleted(product: product));
@@ -56,7 +56,7 @@ class BottomSheetTodo extends StatelessWidget {
           },
           child: ListTile(
             title: Text(
-              "Delete todo",
+              "Delete product",
               style: Theme.of(context).textTheme.bodyText1,
             ),
             trailing: Icon(Icons.delete),
